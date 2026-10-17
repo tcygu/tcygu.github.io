@@ -1,0 +1,30 @@
+{#-
+  页脚：在 Material 原版基础上加「阅读数」（busuanzi 不蒜子）
+  数据由 extra_javascript 里的 busuanzi 脚本填充，失败时整块自动隐藏。
+-#}
+<div class="md-copyright">
+  {% if config.copyright %}
+    <div class="md-copyright__highlight">
+      {{ config.copyright }}
+    </div>
+  {% endif %}
+
+  <div class="md-copyright__stats">
+    <span id="busuanzi_container_page_pv" style="display: none">
+      本文阅读 <span id="busuanzi_value_page_pv">–</span> 次
+    </span>
+    <span id="busuanzi_container_site_pv" style="display: none">
+      · 全站访问 <span id="busuanzi_value_site_pv">–</span> 次
+    </span>
+    <span id="busuanzi_container_site_uv" style="display: none">
+      · 访客 <span id="busuanzi_value_site_uv">–</span> 人
+    </span>
+  </div>
+
+  {% if not config.extra.generator == false %}
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  {% endif %}
+</div>

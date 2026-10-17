@@ -20,6 +20,7 @@ theme:
   name: material
   language: zh
   font: false # 不加载 Google Fonts，国内访问更快
+  custom_dir: overrides # 主题覆盖：评论、页脚阅读数
   icon:
     logo: material/notebook-heart-outline
     repo: fontawesome/brands/github
@@ -139,8 +140,18 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js
   - https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js
   - javascripts/katex.js
+  # 阅读数（不蒜子）。若以后想换成 Cloudflare Analytics / umami，删掉这一行即可
+  - https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js
 
 extra:
+  # 评论：giscus（https://giscus.app）
+  # repo_id 已填好；category_id 需要你从 giscus.app 配置页复制过来
+  giscus:
+    repo: tcygu/tcygu.github.io
+    repo_id: R_kgDOVNHZGg
+    category: Announcements
+    category_id: "" # TODO: 填上后评论才会出现
+
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/tcygu

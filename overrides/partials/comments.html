@@ -1,0 +1,61 @@
+{#-
+  giscus 评论
+  ---------------------------------------------------------------------------
+  需要先在 mkdocs.yml 的 extra.giscus 里填好 repo_id 和 category_id。
+  没填时这里不输出任何东西，页面不会有空白块。
+-#}
+{% set giscus = config.extra.giscus %}
+{% set src = page.file.src_uri | default("", true) %}
+{% set auto = (src.startswith("blog/posts/") or src.startswith("solution/")) and not src.endswith("index.md") %}
+{% set flag = page.meta.comments if page.meta and page.meta.comments is defined else none %}
+{% set enabled = (flag == true) or (flag is none and auto) %}
+
+{% if giscus and giscus.repo_id and giscus.category_id and enabled %}
+<div class="giscus-wrap" id="__comments">
+  <script src="https://giscus.app/client.js"
+          data-repo="{{ giscus.repo }}"
+          data-repo-id="{{ giscus.repo_id }}"
+          data-category="{{ giscus.category }}"
+          data-category-id="{{ giscus.category_id }}"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="preferred_color_scheme"
+          data-lang="zh-CN"
+          data-loading="lazy"
+          crossorigin="anonymous"
+          async>
+  </script>
+  <script>
+    /* 让 giscus 跟随 Material 的深浅色切换 */
+    (function () {
+      function scheme() {
+        return document.body.getAttribute("data-md-color-scheme") === "slate"
+          ? "dark"
+          : "light";
+      }
+      function apply() {
+        var frame = document.querySelector("iframe.giscus-frame");
+        if (!frame) return;
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { theme: scheme() } } },
+          "https://giscus.app"
+        );
+      }
+      var tries = 0;
+      var timer = setInterval(function () {
+        if (document.querySelector("iframe.giscus-frame") || ++tries > 40) {
+          clearInterval(timer);
+          apply();
+        }
+      }, 250);
+      new MutationObserver(apply).observe(document.body, {
+        attributes: true,
+        attributeFilter: ["data-md-color-scheme"]
+      });
+    })();
+  </script>
+</div>
+{% endif %}

@@ -134,6 +134,66 @@ int main() { return 0; }
 --8<-- "snippets/cf-template.cpp"
 ```
 
+## 评论（giscus）
+
+评论挂在 GitHub Discussions 上，免费、无服务器。代码已经接好，只差两个开关：
+
+1. **仓库开启 Discussions**：Settings → General → Features → 勾选 **Discussions**
+2. 打开 <https://giscus.app/zh-CN>，「仓库」填 `tcygu/tcygu.github.io`
+3. 分类选 **Announcements**（或新建一个），按提示授权
+4. 页面下方会生成一段配置，把其中的 **`data-category-id`** 复制到
+   `mkdocs.yml` → `extra.giscus.category_id`（现在还是空的）
+5. `.\scripts\publish.ps1 -Message "feat: 开启评论"` 发布
+
+填好后，博客文章页和题解页底部就会出现评论区。
+
+| 项 | 说明 |
+| --- | --- |
+| `repo` / `repo_id` | 已填好（`R_kgDOVNHZGg`），不用动 |
+| 显示范围 | `blog/posts/` 和 `solution/` 下**非 index** 的页面 |
+| 单独开启 | 页面 front matter 加 `comments: true` |
+| 单独关闭 | 加 `comments: false` |
+| 主题 | 跟随站点深浅色自动切换（`overrides/partials/comments.html` 里有同步脚本） |
+
+## 图片（图床）
+
+推荐直接把图片放进仓库，不依赖任何第三方图床：
+
+```powershell
+.\scripts\add-image.ps1 .\screenshot.png
+.\scripts\add-image.ps1 a.jpg b.png -MaxWidth 1200 -Quality 80
+```
+
+脚本会：
+
+- 超过 `MaxWidth`（默认 1600px）的等比缩小
+- 不透明的图自动在 PNG / JPEG 里选体积小的那个（截图通常能省 50% 以上）
+- 有透明通道的保持 PNG
+- 压缩后反而变大就直接用原图
+- 存进 `docs\assets\2026-10\`，并打印可直接粘贴的 Markdown
+
+输出示例：
+
+```text
+[OK] shot.png
+     尺寸 1600x1067   体积 471 KB -> 237 KB（省 50%）
+     ![](/assets/2026-10/shot.jpg)
+```
+
+> 图片地址用 `/assets/...` 这种站点根路径，从任何目录的 md 文件都能正确引用。
+> 以后图片多到仓库膨胀，再迁到 Cloudflare R2 / 阿里云 OSS，把 `/assets/` 前缀换成图床域名即可。
+
+## 阅读数
+
+页脚显示「本文阅读 N 次 · 全站访问 M 次 · 访客 U 人」，用的是[不蒜子](https://busuanzi.ibruce.info/)：
+
+- 零配置、免费、国内可访问
+- 脚本在 `mkdocs.yml` 的 `extra_javascript`，显示模板在 `overrides/partials/copyright.html`
+- 服务挂掉时整块自动隐藏，不会留下「本文阅读 次」这种空文案
+- ⚠️ **不要开启 `navigation.instant`**，否则页面不整页刷新，计数不会更新
+
+想要更精确的统计（来源、停留时间），可以另接 Cloudflare Web Analytics 或 umami，把 `extra_javascript` 里 busuanzi 那行删掉即可。
+
 ## 部署
 
 1. 在 GitHub 新建仓库 `你的用户名.github.io`，把本项目 push 上去（分支 `main`）。
@@ -169,8 +229,8 @@ int main() { return 0; }
 
 ## 可选增强
 
-- **评论**：[giscus](https://giscus.app/)（挂在 GitHub Discussions 上，免费）
-- **统计**：Cloudflare Web Analytics / umami
-- **图床 / 大图**：图片放 `docs/assets/`，超过 1MB 的先压缩
+- **统计**：Cloudflare Web Analytics / umami（比不蒜子精确）
+- **图床**：Cloudflare R2 / 阿里云 OSS（图片量大时）
 - **Mermaid 流程图**：`pymdownx.superfences` 的 `custom_fences` + `mermaid.esm.min.mjs`
 - **Cloudflare Pages**：同一仓库再挂一份，国内访问更稳
+- **搜索增强**：`search` 插件已内置，可加 `search.boost` 给常用页面加权
