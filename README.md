@@ -3,6 +3,8 @@
 个人博客源码。用 [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) 构建，
 部署在 GitHub Pages。
 
+> 📘 **日常更新请看 [MANUAL.md](MANUAL.md)**（完整操作手册：写文章、改文章、图片、发布、排错）。
+
 ## 第一次上手
 
 ```powershell
