@@ -1,0 +1,42 @@
+/* 中文更友好的字体栈（因为 theme.font = false，不加载 Google Fonts） */
+:root {
+  --md-text-font: "Segoe UI", "Microsoft YaHei", "PingFang SC", "Noto Sans SC",
+    system-ui, -apple-system, sans-serif;
+  --md-code-font: "JetBrains Mono", "Cascadia Code", Consolas, "Courier New",
+    monospace;
+}
+
+/* 超长公式横向滚动，不要撑破版面 */
+.md-typeset .arithmatex {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2em;
+}
+
+/* 题目/纪要类小色块 */
+.md-typeset .note-title,
+.md-typeset .admonition-title {
+  font-weight: 600;
+}
+
+/* 表格里的中文换行更好看一点 */
+.md-typeset table:not([class]) {
+  font-size: 0.75rem;
+}
+
+/* 页脚阅读数（busuanzi） */
+.md-copyright__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+/* 评论区与正文的间距 */
+#__comments {
+  margin-top: 3rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  padding-top: 1.2rem;
+}
