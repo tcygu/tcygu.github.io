@@ -1,0 +1,150 @@
+# ==========================================================================
+#  个人博客配置（MkDocs Material）
+#
+#  站点地址：https://tcygu.github.io/
+#  搜索 "TODO" 可以快速定位还没填的地方
+# ==========================================================================
+
+site_name: tcygu.github.io
+site_description: 算法 · 题解 · 随笔
+site_author: tcygu
+site_url: https://tcygu.github.io/
+
+repo_name: tcygu/tcygu.github.io
+repo_url: https://github.com/tcygu/tcygu.github.io
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 tcygu
+
+theme:
+  name: material
+  language: zh
+  font: false # 不加载 Google Fonts，国内访问更快
+  icon:
+    logo: material/notebook-heart-outline
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs # 顶部一级导航
+    - navigation.tabs.sticky
+    - navigation.sections # 侧栏按目录折叠
+    - navigation.indexes # 目录本身也可以是一个页面
+    - navigation.top # 回到顶部
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy # 代码块一键复制
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
+
+nav:
+  - 首页: index.md
+  - 博客: blog/index.md # 归档页 / 分类页由 blog 插件自动挂到这个节点下
+  - 算法笔记:
+      - algo/index.md
+      - 动态规划: algo/dp/index.md
+      - 数据结构: algo/ds/index.md
+      - 数学: algo/math/index.md
+      - 图论: algo/graph/index.md
+      - 字符串: algo/string/index.md
+      - 杂项: algo/misc/index.md
+  - 题解:
+      - solution/index.md
+      - 2026 年:
+          - solution/2026/index.md
+          - 石子袋子 C: solution/2026/stonebag-C.md
+  - 记录: records/index.md
+  - 杂项: misc/index.md
+  - 标签: tags.md
+  - 关于: about.md
+  - 友链: friends.md
+
+plugins:
+  - search:
+      lang: [zh, en]
+  - tags # 列表写在 docs/tags.md 里，用 <!-- material/tags --> 指令
+  - blog:
+      blog_dir: blog
+      post_dir: "{blog}/posts"
+      authors: true
+      categories: true
+      archive: true
+      pagination_per_page: 8
+      post_readtime: true
+      post_excerpt: optional
+  - rss:
+      use_git: false # 不依赖 git 提交时间，用文章里的 date
+      match_path: "blog/posts/.*"
+      date_from_meta:
+        as_creation: date
+      categories:
+        - categories
+        - tags
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.keys
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets # 用 --8<-- "snippets/xxx.cpp" 复用代码
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex: # 数学公式（KaTeX）
+      generic: true
+  - pymdownx.smartsymbols
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css
+  - stylesheets/extra.css
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js
+  - https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js
+  - javascripts/katex.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/tcygu
+      name: GitHub
+    # TODO: 填上邮箱后，把下面三行的 # 去掉
+    # - icon: fontawesome/solid/envelope
+    #   link: mailto:you@example.com
+    #   name: 邮箱

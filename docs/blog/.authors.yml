@@ -1,0 +1,7 @@
+# 作者信息。文章 front matter 里写 authors: [me] 即可引用
+# 注意：作者必须放在顶层 authors: 下面
+authors:
+  me:
+    name: tcygu
+    description: OIer · 算法竞赛
+    avatar: https://github.com/tcygu.png
