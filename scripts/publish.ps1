@@ -40,6 +40,30 @@ if (-not $git) {
     exit 1
 }
 
+# ---------- git 网络环境适配 ----------
+# NO_PROXY 里如果包含 127.0.0.1，libcurl 可能把「本地代理」本身也排除掉，
+# 导致 git 绕过代理直连 GitHub -> 超时 / TLS 握手失败。
+$env:NO_PROXY = ""
+$env:no_proxy = ""
+
+# 代理端口不通时，本次临时走直连，避免一卡两分钟
+$gitNetArgs = @()
+$proxyUrl = (& $git config --global --get https.proxy 2>$null)
+if ($proxyUrl -and $proxyUrl -match '127\.0\.0\.1:(\d+)') {
+    $port = [int]$Matches[1]
+    $alive = $false
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $iar = $client.BeginConnect("127.0.0.1", $port, $null, $null)
+        $alive = $iar.AsyncWaitHandle.WaitOne(800) -and $client.Connected
+        $client.Close()
+    } catch { $alive = $false }
+    if (-not $alive) {
+        $gitNetArgs = @("-c", "http.proxy=", "-c", "https.proxy=")
+        Write-Host "[i] 代理 $proxyUrl 未运行，本次直连。" -ForegroundColor DarkGray
+    }
+}
+
 # ---------- 有没有要发的 ----------
 $changes = & $git status --porcelain
 $pending = & $git log --oneline "origin/main..HEAD" 2>$null
@@ -81,7 +105,7 @@ if (-not $Message) {
 
 # ---------- 2. 同步远程 ----------
 Write-Host "`n[2/4] 同步远程（git pull --rebase --autostash）..." -ForegroundColor Cyan
-& $git pull --rebase --autostash --quiet
+& $git @gitNetArgs pull --rebase --autostash --quiet
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[x] 拉取失败：可能有冲突，或网络不通。" -ForegroundColor Red
     Write-Host "    解决冲突后执行 git rebase --continue，再重新发布。" -ForegroundColor DarkGray
@@ -109,7 +133,7 @@ if ($changes) {
 
 # ---------- 4. 推送 ----------
 Write-Host "`n[4/4] 推送..." -ForegroundColor Cyan
-& $git push --quiet
+& $git @gitNetArgs push --quiet
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[x] 推送失败：检查网络或 GitHub 凭据。" -ForegroundColor Red
     exit 1

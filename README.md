@@ -202,6 +202,27 @@ int main() { return 0; }
 3. 仓库 **Settings → Pages** → Source 选 **Deploy from a branch** → 分支 `gh-pages` / `(root)`。
 4. 之后每次 `git push`，Actions 会自动构建并更新线上站点。
 
+> ⚠️ **如果你的电脑开着本地代理（Clash / v2ray / Surge 等）**
+>
+> 浏览器能上 GitHub 不代表 `git` 能上——git 不读 Windows 的“系统代理”设置。症状是：
+> `Failed to connect to github.com:443`，但网页打得开。
+>
+> 让 git 也走代理（端口换成你自己客户端的）：
+>
+> ```powershell
+> git config --global http.proxy http://127.0.0.1:12450
+> git config --global https.proxy http://127.0.0.1:12450
+> ```
+>
+> 彻底关掉代理后如果不通，清掉配置：
+>
+> ```powershell
+> git config --global --unset http.proxy
+> git config --global --unset https.proxy
+> ```
+>
+> 本机当前已配置为 `127.0.0.1:12450`。
+
 ## 一条命令发布
 
 `scripts/publish.ps1` 把「构建自检 → 拉取远程 → 提交 → 推送」合成一步：
