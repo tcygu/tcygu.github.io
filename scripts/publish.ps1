@@ -40,18 +40,24 @@ if (-not $git) {
     exit 1
 }
 
-# ---------- 有没有改动 ----------
+# ---------- 有没有要发的 ----------
 $changes = & $git status --porcelain
-if (-not $changes) {
-    Write-Host "[=] 没有改动，无需发布。" -ForegroundColor Yellow
+$pending = & $git log --oneline "origin/main..HEAD" 2>$null
+
+if (-not $changes -and -not $pending) {
+    Write-Host "[=] 没有改动，也没有未推送的提交，无需发布。" -ForegroundColor Yellow
     exit 0
 }
 
-Write-Host "[i] 待提交的改动：" -ForegroundColor DarkGray
-$changes | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+if ($changes) {
+    Write-Host "[i] 待提交的改动：" -ForegroundColor DarkGray
+    $changes | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+} else {
+    Write-Host "[i] 没有新改动，但有 $($pending.Count) 个提交还没推送，继续推送。" -ForegroundColor DarkGray
+}
 
 # ---------- 1. 构建自检 ----------
-if (-not $SkipCheck) {
+if ($changes -and -not $SkipCheck) {
     $py = Find-Exe @(
         (Join-Path $root ".venv\Scripts\python.exe"),
         (Join-Path $root ".venv\bin\python.exe")
@@ -83,18 +89,22 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------- 3. 提交 ----------
-Write-Host "`n[3/4] 提交：$Message" -ForegroundColor Cyan
-& $git add -A
+if ($changes) {
+    Write-Host "`n[3/4] 提交：$Message" -ForegroundColor Cyan
+    & $git add -A
 
-# 提交信息写进 UTF-8 文件再交给 git，避免中文编码问题
-$msgFile = Join-Path $env:TEMP "publish-commit-msg.txt"
-[System.IO.File]::WriteAllText($msgFile, $Message, [System.Text.UTF8Encoding]::new($false))
-& $git commit --quiet --file $msgFile
-$commitCode = $LASTEXITCODE
-Remove-Item $msgFile -Force -ErrorAction SilentlyContinue
-if ($commitCode -ne 0) {
-    Write-Host "[x] 提交失败。" -ForegroundColor Red
-    exit 1
+    # 提交信息写进 UTF-8 文件再交给 git，避免中文编码问题
+    $msgFile = Join-Path $env:TEMP "publish-commit-msg.txt"
+    [System.IO.File]::WriteAllText($msgFile, $Message, [System.Text.UTF8Encoding]::new($false))
+    & $git commit --quiet --file $msgFile
+    $commitCode = $LASTEXITCODE
+    Remove-Item $msgFile -Force -ErrorAction SilentlyContinue
+    if ($commitCode -ne 0) {
+        Write-Host "[x] 提交失败。" -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "`n[3/4] 没有新改动，跳过提交。" -ForegroundColor DarkGray
 }
 
 # ---------- 4. 推送 ----------
@@ -108,9 +118,13 @@ if ($LASTEXITCODE -ne 0) {
 # ---------- 完成 ----------
 # 注意：不要用 git log 的输出打印提交信息——PowerShell 5.1 会按系统编码解码
 # git 的 UTF-8 输出，中文会变成乱码（仓库里存的其实是好的）。这里直接用变量拼。
-$shortSha = (& $git rev-parse --short HEAD | Select-Object -First 1).Trim()
-$firstLine = ($Message -split "`n")[0]
-$last = "$shortSha $firstLine"
+if ($changes) {
+    $shortSha = (& $git rev-parse --short HEAD | Select-Object -First 1).Trim()
+    $firstLine = ($Message -split "`n")[0]
+    $last = "$shortSha $firstLine"
+} else {
+    $last = "已推送 $($pending.Count) 个待推送提交"
+}
 
 # 从 remote 推导 Actions 链接
 $actionsUrl = "https://github.com/tcygu/tcygu.github.io/actions"
