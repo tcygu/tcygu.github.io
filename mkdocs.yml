@@ -150,7 +150,7 @@ extra:
     repo: tcygu/tcygu.github.io
     repo_id: R_kgDOVNHZGg
     category: Announcements
-    category_id: "" # TODO: 填上后评论才会出现
+    category_id: "DIC_kwDOVNHZGs4DIteY" # TODO: 填上后评论才会出现
 
   social:
     - icon: fontawesome/brands/github
