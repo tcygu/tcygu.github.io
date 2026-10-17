@@ -142,6 +142,31 @@ int main() { return 0; }
 3. 仓库 **Settings → Pages** → Source 选 **Deploy from a branch** → 分支 `gh-pages` / `(root)`。
 4. 之后每次 `git push`，Actions 会自动构建并更新线上站点。
 
+## 一条命令发布
+
+`scripts/publish.ps1` 把「构建自检 → 拉取远程 → 提交 → 推送」合成一步：
+
+```powershell
+# 带提交信息
+.\scripts\publish.ps1 -Message "post: 新增 CF2274E 题解"
+
+# 不写信息，自动用当前时间
+.\scripts\publish.ps1
+
+# 有改动但不想跑构建自检
+.\scripts\publish.ps1 -Message "fix: 改错别字" -SkipCheck
+```
+
+它按这个顺序执行，中间任何一步失败都会停下来：
+
+1. `mkdocs build --strict`——内容有错就不提交（`-SkipCheck` 可跳过）
+2. `git pull --rebase --autostash`——多设备写作时避免 push 被拒
+3. `git add -A` + `git commit -F`（从 UTF-8 文件读提交信息，中文不会乱码）
+4. `git push`
+5. 打印本次提交和 Actions 部署链接
+
+> 提交信息建议用前缀：`post:` 新文章、`fix:` 修正、`chore:` 杂务。
+
 ## 可选增强
 
 - **评论**：[giscus](https://giscus.app/)（挂在 GitHub Discussions 上，免费）

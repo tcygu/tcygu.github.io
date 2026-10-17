@@ -90,6 +90,7 @@ plugins:
       post_excerpt: optional
   - rss:
       use_git: false # 不依赖 git 提交时间，用文章里的 date
+      image: https://avatars.githubusercontent.com/u/299718437?v=4 # feed 里的站点小图标
       match_path: "blog/posts/.*"
       date_from_meta:
         as_creation: date

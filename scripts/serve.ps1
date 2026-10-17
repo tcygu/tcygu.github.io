@@ -4,9 +4,11 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 
-# RSS 插件的依赖 GitPython 在没有 git 时会直接抛异常；这里先压掉。
-# 装好 git 之后这一行可以删掉。
-$env:GIT_PYTHON_REFRESH = "quiet"
+# 兼容「装了 git 但终端 PATH 还没刷新」的情况
+$gitDir = "C:\Program Files\Git\cmd"
+if ((Test-Path $gitDir) -and ($env:PATH -notlike "*$gitDir*")) {
+    $env:PATH = "$gitDir;$env:PATH"
+}
 
 $candidates = @(
     (Join-Path $root ".venv\Scripts\python.exe"),   # 标准 Windows Python

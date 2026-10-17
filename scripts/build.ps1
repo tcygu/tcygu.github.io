@@ -4,8 +4,11 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 
-# 没有 git 时，RSS 插件的依赖 GitPython 会抛异常；先压掉。
-$env:GIT_PYTHON_REFRESH = "quiet"
+# 兼容「已经装了 git，但当前终端是装之前开的」——PATH 没刷新时 GitPython 会找不到 git
+$gitDir = "C:\Program Files\Git\cmd"
+if ((Test-Path $gitDir) -and ($env:PATH -notlike "*$gitDir*")) {
+    $env:PATH = "$gitDir;$env:PATH"
+}
 
 $candidates = @(
     (Join-Path $root ".venv\Scripts\python.exe"),
@@ -19,3 +22,4 @@ if (-not $python) {
 }
 
 & $python -m mkdocs build --strict @args
+exit $LASTEXITCODE
