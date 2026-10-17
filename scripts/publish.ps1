@@ -106,7 +106,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------- 完成 ----------
-$last = & $git log -1 --pretty="%h %s"
+# 注意：不要用 git log 的输出打印提交信息——PowerShell 5.1 会按系统编码解码
+# git 的 UTF-8 输出，中文会变成乱码（仓库里存的其实是好的）。这里直接用变量拼。
+$shortSha = (& $git rev-parse --short HEAD | Select-Object -First 1).Trim()
+$firstLine = ($Message -split "`n")[0]
+$last = "$shortSha $firstLine"
 
 # 从 remote 推导 Actions 链接
 $actionsUrl = "https://github.com/tcygu/tcygu.github.io/actions"
